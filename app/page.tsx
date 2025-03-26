@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { GetTracksResponse, Track } from "./yt-tracks/route";
-import { YoutubeTrack } from "./YoutubeTrack";
+import { YoutubeTrack } from "./components/YoutubeTrack";
 import Image from "next/image";
-import { SpotifyTracks } from "./SpotifyTracks";
+import { SpotifyTracks } from "./components/SpotifyTracks";
+import { SpotifyTrack } from "./components/SpotifyTrack";
+import { SpotifySearchForm } from "./components/SpotifySearchForm";
 
 export default function Home() {
   const [tracks, setTracks] = useState<GetTracksResponse | null>(null);
@@ -13,14 +15,6 @@ export default function Home() {
     const data = await res.json();
     setTracks(data);
   };
-
-  useEffect(() => {
-    fetchTracks();
-  }, []);
-
-  if (!tracks) {
-    return <>...</>;
-  }
 
   async function goPrevYTSong() {
     try {
@@ -36,9 +30,59 @@ export default function Home() {
     }
   }
 
+  const notifyMismatch = () => {
+    if (Notification.permission === "granted") {
+      new Notification("There is a mismatch! 🙂");
+      new Audio("notification.wav").play();
+      return;
+    }
+  };
+
+  const handleSpotifyTracks = (sfyTracks: SpotifyTrack[]) => {
+    const hasMismatch =
+      sfyTracks.length > 0 && sfyTracks[0].title !== tracks?.current.title;
+
+    if (hasMismatch) notifyMismatch();
+  };
+
+  useEffect(() => {
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+      return;
+    }
+
+    if (Notification.permission === "default") {
+      alert("Let us notify you when there is a mismatch!");
+      Notification.requestPermission();
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTracks();
+  }, []);
+
+  if (!tracks) {
+    return <>...</>;
+  }
+
   return (
     <div className="min-h-screen">
       <main className="w-full flex flex-col items-center py-16 space-y-10">
+        <header className="grid gap-x-8 place-items-center grid-cols-[600px_600px]">
+          <Image
+            src="/youtube_music.svg"
+            alt="youtube music logo"
+            width={120}
+            height={120}
+          />
+          <Image
+            src="/spotify.svg"
+            alt="spotify logo"
+            width={120}
+            height={120}
+          />
+        </header>
         <section className="grid gap-8 grid-cols-[600px_600px] grid-rows-[auto_auto]">
           <ul className="space-y-5 opacity-50">
             {tracks.prev.map((track: Track) => (
@@ -58,33 +102,12 @@ export default function Home() {
             onClick={() => {
               goPrevYTSong();
             }}
-            className="mx-auto block cursor-pointer active:outline-4 outline-sky-600 bg-[#1e71d7] hover:brightness-115 font-bold rounded-lg w-max px-3 py-1.5"
+            className="mx-auto block place-self-center cursor-pointer active:outline-4 outline-sky-600 bg-sky-600 hover:brightness-115 rounded-lg w-max px-3 py-1.5"
           >
             Move to previous song
           </button>
-          <a
-            href={`https://open.spotify.com/search/${tracks.current.q}`}
-            target="_blank"
-            className="mx-auto block cursor-pointer active:outline-4 outline-sky-600 bg-[#1e71d7] hover:brightness-115 font-bold rounded-lg w-max px-3 py-1.5"
-          >
-            Go to Spotify with search
-          </a>
-          {/* <ul></ul> */}
+          <SpotifySearchForm defaultSearchQuery={tracks.current.title} />
         </section>
-        <header className="grid gap-x-8 place-items-center grid-cols-[600px_600px]">
-          <Image
-            src="/youtube_music.svg"
-            alt="youtube music logo"
-            width={120}
-            height={120}
-          />
-          <Image
-            src="/spotify.svg"
-            alt="spotify logo"
-            width={120}
-            height={120}
-          />
-        </header>
         <section className="grid gap-x-8 grid-cols-[600px_600px]">
           <ul className="space-y-5">
             <YoutubeTrack
@@ -111,7 +134,12 @@ export default function Home() {
               />
             ))}
           </ul>
-          {tracks.current && <SpotifyTracks query={tracks.current.q} />}
+          {tracks.current && (
+            <SpotifyTracks
+              query={tracks.current.q}
+              onFetchedTracks={handleSpotifyTracks}
+            />
+          )}
         </section>
       </main>
     </div>

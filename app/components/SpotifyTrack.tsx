@@ -36,7 +36,7 @@ export const SpotifyTrack = ({
         </p>
         <button
           // onClick={() => {}}
-          className="mt-2 cursor-pointer text-black active:outline-4 outline-sky-600 ml-auto block bg-[#1ed760] hover:brightness-115 font-bold rounded-lg w-max px-3 py-1.5"
+          className="mt-2 cursor-pointer text-black active:outline-4 outline-sky-600 ml-auto block bg-[#1ed760] hover:brightness-115 rounded-lg w-max px-3 py-1.5"
         >
           Add to playlist
         </button>

@@ -1,11 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { SpotifyTrack } from "./SpotifyTrack";
-import { SearchResponse } from "./interfaces/spotify/search-response";
-
-interface SpotifyTracksProps {
-  query: string;
-}
+import { SearchResponse } from "../interfaces/spotify/search-response";
 
 interface SpotifyTokenResponse {
   access_token: string;
@@ -13,7 +9,15 @@ interface SpotifyTokenResponse {
   expires_in: number;
 }
 
-export const SpotifyTracks = ({ query }: SpotifyTracksProps) => {
+interface SpotifyTracksProps {
+  query: string;
+  onFetchedTracks: (tracks: SpotifyTrack[]) => void;
+}
+
+export const SpotifyTracks = ({
+  query,
+  onFetchedTracks,
+}: SpotifyTracksProps) => {
   const [tracks, setTracks] = useState<SpotifyTrack[] | null>(null);
 
   const fetchToken = async () => {
@@ -66,6 +70,7 @@ export const SpotifyTracks = ({ query }: SpotifyTracksProps) => {
 
     const formattedTracks = formatSpotifyTracks(data);
     setTracks(formattedTracks);
+    onFetchedTracks(formattedTracks);
   };
 
   useEffect(() => {
@@ -73,38 +78,39 @@ export const SpotifyTracks = ({ query }: SpotifyTracksProps) => {
     fetchSpotifyTracks(query);
   }, [query]);
 
-  if (tracks === null) {
-    return (
-      <ul className="space-y-5">
-        {[1, 2, 3].map((_, i) => (
-          <div
-            key={i}
-            className="skeleton h-[140px] grid grid-cols-[100px_auto] gap-8 rounded-lg shadow p-5  space-x-5"
-          >
-            <div className="skeleton w-[100px] h-[100px]"></div>
-            <div>
-              <h3 className="text-2xl text-transparent skeleton font-extrabold">
-                _
-              </h3>
-              <p className="w-32 text-transparent skeleton mt-2">_</p>
-              <button
-                // onClick={() => {}}
-                className="mt-2 text-transparent skeleton ml-auto block font-bold rounded-lg w-max px-3 py-1.5"
-              >
-                ____________
-              </button>
-            </div>
-          </div>
-        ))}
-      </ul>
-    );
-  }
-
   return (
     <ul className="space-y-5">
-      {tracks.map((track) => (
+      {tracks === null && <Skeleton />}
+      {tracks?.map((track) => (
         <SpotifyTrack key={track.link} track={track} />
       ))}
     </ul>
   );
 };
+
+function Skeleton() {
+  return (
+    <ul className="space-y-5">
+      {[1, 2, 3].map((_, i) => (
+        <div
+          key={i}
+          className="skeleton h-[140px] grid grid-cols-[100px_auto] gap-8 rounded-lg shadow p-5  space-x-5"
+        >
+          <div className="skeleton w-[100px] h-[100px]"></div>
+          <div>
+            <h3 className="text-2xl text-transparent skeleton font-extrabold">
+              _
+            </h3>
+            <p className="w-32 text-transparent skeleton mt-2">_</p>
+            <button
+              // onClick={() => {}}
+              className="mt-2 text-transparent skeleton ml-auto block font-bold rounded-lg w-max px-3 py-1.5"
+            >
+              ____________
+            </button>
+          </div>
+        </div>
+      ))}
+    </ul>
+  );
+}

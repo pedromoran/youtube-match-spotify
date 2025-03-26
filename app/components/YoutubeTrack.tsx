@@ -48,7 +48,7 @@ export const YoutubeTrack = ({
             onClick={() => {
               goNextYTSong();
             }}
-            className="mt-2 cursor-pointer active:outline-4 outline-sky-600 ml-auto block bg-[#d71e1e] hover:brightness-115 font-bold rounded-lg w-max px-3 py-1.5"
+            className="mt-2 cursor-pointer active:outline-4 outline-sky-600 ml-auto block bg-[#d71e1e] hover:brightness-115  rounded-lg w-max px-3 py-1.5"
           >
             Discard song
           </button>
