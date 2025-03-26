@@ -65,6 +65,10 @@ export const ToutubeTracks = () => {
     return <>...</>;
   }
 
+  // https://www.googleapis.com/youtube/v3/playlistItems?playlistId=PLzXxG3O_lu6A7Ad8Iz9A7pa0_zhT0WXmy&part=contentDetails,id,snippet
+
+  // https://www.googleapis.com/youtube/v3/videos?id=fyrmM_SYC0Q&part=contentDetails,fileDetails,id,liveStreamingDetails,player,processingDetails,recordingDetails,snippet,statistics,topicDetails
+
   return (
     <section>
       <ul className="space-y-5 opacity-50">
