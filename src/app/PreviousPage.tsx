@@ -111,9 +111,6 @@ export default function Home() {
   // const [oauth2, setOauth2] = useState<OAuth2 | null>(null);
   const oauth2 = useRef<OAuth2>(null);
   // const [codeClient, setCodeClient] = useState<CodeClient | null>(null);
-  // const [youtubeAccessToken, setYoutubeAccessToken] = useState<string | null>(
-  //   null
-  // );
 
   const fetchTracks = async () => {
     const res = await fetch(window.origin + "/yt-tracks");
@@ -207,6 +204,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchTracks();
+
     // (async () => {
     //   fetch("https://accounts.google.com/gsi/client").then((res) => {
     //     if (res.ok) {
@@ -220,6 +218,19 @@ export default function Home() {
     //     }
     //   });
     // })();
+  }, []);
+
+  useEffect(() => {
+    if (!window.location.hash) return;
+    const parsedHash = new URLSearchParams(window.location.hash.substring(1));
+    // state: pass-through value
+    // access_token:
+    // token_type: Bearer
+    // expires_in:
+    // scope:
+    console.log(parsedHash);
+
+    // access_token
   }, []);
 
   if (!tracks) {
@@ -246,77 +257,77 @@ export default function Home() {
           </span>
           <span>Code Authorization with Google</span>
         </button>
-        <section className="grid gap-x-8 grid-cols-[600px_600px]">
-          <div className="flex flex-col items-center space-y-5">
-            <Image
-              className="mx-auto"
-              src="/youtube_music.svg"
-              alt="youtube music logo"
-              width={120}
-              height={120}
-            />
-
-            <button
-              onClick={() => {
-                goPrevYTSong();
-              }}
-              className="cursor-pointer active:outline-4 outline-sky-600 bg-sky-600 hover:brightness-115 rounded-lg w-max px-3 py-1.5"
-            >
-              Move to previous song
-            </button>
-            <ul className="pr-4 py-4 self-stretch space-y-5 overflow-y-scroll max-h-[600px]">
-                {tracks.prev.map((track: Track) => (
-                  <YoutubeTrack
-                    key={track.q}
-                    title={track.title}
-                    artist={track.artist}
-                    album={track.album}
-                    q={track.q}
-                    thumbnail={track.thumbnail}
-                    onMoveToTrack={() => {}}
-                    isPrev
-                  />
-                ))}
+        <header className="grid gap-x-8 place-items-center grid-cols-[600px_600px]">
+          <Image
+            src="/youtube_music.svg"
+            alt="youtube music logo"
+            width={120}
+            height={120}
+          />
+          <Image
+            src="/spotify.svg"
+            alt="spotify logo"
+            width={120}
+            height={120}
+          />
+        </header>
+        <section className="grid gap-8 grid-cols-[600px_600px] grid-rows-[auto_auto]">
+          <ul className="space-y-5 opacity-50">
+            {tracks.prev.map((track: Track) => (
               <YoutubeTrack
-                title={tracks.current.title}
-                artist={tracks.current.artist}
-                album={tracks.current.album}
-                q={tracks.current.q}
-                thumbnail={tracks.current.thumbnail}
-                onNextTrack={() => {
-                  fetch(window.origin + "/yt-tracks")
-                    .then((res) => res.json())
-                    .then((data) => setTracks(data));
-                }}
+                key={track.q}
+                title={track.title}
+                artist={track.artist}
+                album={track.album}
+                q={track.q}
+                thumbnail={track.thumbnail}
+                viewOnly
               />
-              {tracks.next.map((track: Track) => (
-                <YoutubeTrack
-                  key={track.q}
-                  title={track.title}
-                  artist={track.artist}
-                  album={track.album}
-                  q={track.q}
-                  thumbnail={track.thumbnail}
-                  viewOnly
-                />
-              ))}
-            </ul>
-          </div>
-          <div className="space-y-6">
-            <Image
-              src="/spotify.svg"
-              alt="spotify logo"
-              width={120}
-              height={120}
+            ))}
+          </ul>
+          <ul></ul>
+          <button
+            onClick={() => {
+              goPrevYTSong();
+            }}
+            className="mx-auto block place-self-center cursor-pointer active:outline-4 outline-sky-600 bg-sky-600 hover:brightness-115 rounded-lg w-max px-3 py-1.5"
+          >
+            Move to previous song
+          </button>
+          <SpotifySearchForm defaultSearchQuery={tracks.current.title} />
+        </section>
+        <section className="grid gap-x-8 grid-cols-[600px_600px]">
+          <ul className="space-y-5">
+            <YoutubeTrack
+              title={tracks.current.title}
+              artist={tracks.current.artist}
+              album={tracks.current.album}
+              q={tracks.current.q}
+              thumbnail={tracks.current.thumbnail}
+              onNextTrack={() => {
+                fetch(window.origin + "/yt-tracks")
+                  .then((res) => res.json())
+                  .then((data) => setTracks(data));
+              }}
             />
-            <SpotifySearchForm defaultSearchQuery={tracks.current.title} />
-            {tracks.current && (
-              <SpotifyTracks
-                query={tracks.current.q}
-                onFetchedTracks={handleSpotifyTracks}
+            {tracks.next.map((track: Track) => (
+              <YoutubeTrack
+                key={track.q}
+                title={track.title}
+                artist={track.artist}
+                album={track.album}
+                q={track.q}
+                thumbnail={track.thumbnail}
+                viewOnly
               />
-            )}
-          </div>
+            ))}
+          </ul>
+          {tracks.current && (
+            <SpotifyTracks
+              query={tracks.current.q}
+              onFetchedTracks={handleSpotifyTracks}
+            />
+          )}
         </section>
       </main>
     </div>

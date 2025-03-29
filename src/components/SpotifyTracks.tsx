@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { SpotifyTrack } from "./SpotifyTrack";
 import { SearchResponse } from "../interfaces/spotify/search-response";
+import Image from "next/image";
 
 interface SpotifyTokenResponse {
   access_token: string;
