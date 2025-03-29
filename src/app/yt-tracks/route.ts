@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import yt_tracks from "./yt-tracks.json";
 import fs from "fs";
 
-const DIR_NAME = process.cwd() + "/app/yt-tracks/";
+const DIR_NAME = process.cwd() + "/src/app/yt-tracks/";
 
 export interface Track {
   title: string;

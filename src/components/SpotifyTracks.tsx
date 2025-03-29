@@ -26,7 +26,7 @@ export const SpotifyTracks = ({
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Basic ${btoa(
-          `${process.env.NEXT_PUBLIC_CLIENT_ID}:${process.env.NEXT_PUBLIC_CLIENT_SECRET}`
+          `${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}:${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET}`
         )}`,
       },
       body: "grant_type=client_credentials",
@@ -67,6 +67,11 @@ export const SpotifyTracks = ({
     )
       .then((res) => res.json())
       .then((data) => data);
+
+    if (Object.hasOwn(data, "error")) {
+      //TODO: set loading to false
+      return;
+    }
 
     const formattedTracks = formatSpotifyTracks(data);
     setTracks(formattedTracks);
